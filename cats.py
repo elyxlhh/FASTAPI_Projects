@@ -1,3 +1,46 @@
+# =============================================================================
+# PATH PARAMETERS vs QUERY PARAMETERS
+# =============================================================================
+#
+# PATH PARAMETER
+#   - Embedded directly in the URL path using curly braces: /cats/{cat_name}
+#   - Always required — the route won't match without it
+#   - Use when the value IDENTIFIES a specific resource
+#   - Example: GET /cats/name-one  →  retrieves one specific cat
+#
+# QUERY PARAMETER
+#   - Appended to the URL after "?": /cats/gender?gender=male
+#   - Can be optional (assign a default value, e.g. gender: str = None)
+#   - Use when the value FILTERS or SEARCHES a collection
+#   - Example: GET /cats/gender?gender=male  →  filters cats by gender
+#   - Multiple query params: /cats/search?hospital=H1&cat_color=black&gender=male
+#
+# QUICK RULE OF THUMB
+#   - Fetching one specific resource  →  path parameter  (/cats/{cat_name})
+#   - Filtering / searching a list    →  query parameter (/cats/gender?gender=male)
+#
+# =============================================================================
+# ROUTE ORDERING RULES (important in FastAPI!)
+# =============================================================================
+#
+# FastAPI matches routes TOP TO BOTTOM and stops at the first match.
+# Incorrect ordering causes routes to be silently shadowed (never reached).
+#
+# CORRECT ORDER:
+#   1. Static paths first          e.g. /cats/gender, /cats/search
+#   2. Path+query mixed paths      e.g. /cats/hospital/{hospital_name}
+#   3. Dynamic path params last    e.g. /cats/{cat_name}
+#
+# WHY: /cats/{cat_name} will match ANY single-segment path under /cats/,
+# including /cats/gender and /cats/search, so it must come last.
+#
+# TRAILING SLASH WORKAROUND (avoid this):
+#   Defining /cats/gender/ (with slash) makes it distinct from /cats/{cat_name},
+#   so it won't be shadowed even if declared after the dynamic route.
+#   However, this is a hack — prefer correct ordering instead.
+#
+# =============================================================================
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
